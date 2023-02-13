@@ -109,6 +109,11 @@ class HandRecog:
         if self.hand_result == None:
             return
 
+        # [8, 5] [5, 0] -> index finger
+        # [12, 9] [9, 0] -> middle finger
+        # [16, 13] [13, 0] -> ring finger
+        # [20, 17] [17, 0] -> pinkie finger
+
         points = [[8,5,0],[12,9,0],[16,13,0],[20,17,0]] 
         self.finger = 0
         self.finger = self.finger | 0 #thumb
@@ -120,10 +125,10 @@ class HandRecog:
             try:
                 ratio = round(dist/dist2,1)
             except:
-                ratio = round(dist1/0.01,1)
+                ratio = round(dist1/0.01,1) # never happen
 
-            self.finger = self.finger << 1
-            if ratio > 0.5 :
+            self.finger = self.finger << 1 # binery gesture 
+            if ratio > 0.5 : # if that finger is up
                 self.finger = self.finger | 1
     
 
