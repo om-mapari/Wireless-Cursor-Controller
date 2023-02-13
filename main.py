@@ -14,15 +14,16 @@ import pyautogui
 from google.protobuf.json_format import MessageToDict
 # import screen_brightness_control as sbcontrol
 
-pyautogui.FAILSAFE = False
-mp_drawing = mp.solutions.drawing_utils
-mp_hands = mp.solutions.hands
-
 
 from handRecog import HandRecog
 from gest import Gest
 from hlabel import HLabel
 from controller import Controller
+pyautogui.FAILSAFE = False
+
+
+mp_drawing = mp.solutions.drawing_utils
+mp_hands = mp.solutions.hands
 
 
 
@@ -55,8 +56,8 @@ class GestureController:
     CAM_HEIGHT = None
     CAM_WIDTH = None
 
-    hr_major = None # Right Hand by defaultj
-    hr_minor = None # Left hand by default
+    hr_major = None 
+    hr_minor = None
     dom_hand = True
 
     def __init__(self):
@@ -106,22 +107,22 @@ class GestureController:
         """
         
         handmajor = HandRecog(HLabel.MAJOR) # 1
-        handminor = HandRecog(HLabel.MINOR) # 0
+        handminor = HandRecog(HLabel.MINOR) # 0 for pinch like gesture
 
         with mp_hands.Hands(max_num_hands = 2,min_detection_confidence=0.5, min_tracking_confidence=0.5) as hands:
-            while GestureController.cap.isOpened() and GestureController.gc_mode:
-                success, image = GestureController.cap.read()
+            while GestureController.cap.isOpened() and GestureController.gc_mode: # 1 frame per unit
+                success, image = GestureController.cap.read() # True & image
 
                 if not success:
                     print("Ignoring empty camera frame.")
                     continue
                 
-                image = cv2.cvtColor(cv2.flip(image, 1), cv2.COLOR_BGR2RGB)
+                image = cv2.cvtColor(cv2.flip(image, 1), cv2.COLOR_BGR2RGB) # BGR -> RGB
                 image.flags.writeable = False
-                results = hands.process(image)
+                results = hands.process(image) # hands = mp.solutions.hands
                 
                 image.flags.writeable = True
-                image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+                image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR) # RGB -> BGR
 
                 if results.multi_hand_landmarks:                   
                     GestureController.classify_hands(results)
@@ -132,7 +133,7 @@ class GestureController:
                     handminor.set_finger_state()
                     gest_name = handminor.get_gesture()
 
-                    if gest_name == Gest.PINCH_MINOR:
+                    if gest_name == Gest.PINCH_MINOR: #for pinch gesture
                         Controller.handle_controls(gest_name, handminor.hand_result)
                     else:
                         gest_name = handmajor.get_gesture()
@@ -143,7 +144,7 @@ class GestureController:
                 else:
                     Controller.prev_hand = None
                 cv2.imshow('Gesture Controller', image)
-                if cv2.waitKey(5) & 0xFF == 13:
+                if cv2.waitKey(10) & 0xFF == ord('q'):
                     break
         GestureController.cap.release()
         cv2.destroyAllWindows()

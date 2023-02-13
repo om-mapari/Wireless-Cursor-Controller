@@ -109,7 +109,7 @@ class HandRecog:
         if self.hand_result == None:
             return
 
-        points = [[8,5,0],[12,9,0],[16,13,0],[20,17,0]]
+        points = [[8,5,0],[12,9,0],[16,13,0],[20,17,0]] 
         self.finger = 0
         self.finger = self.finger | 0 #thumb
         for idx,point in enumerate(points):
