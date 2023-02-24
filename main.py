@@ -58,7 +58,7 @@ class GestureController:
 
     hr_major = None 
     hr_minor = None
-    dom_hand = True
+    dom_hand = True # if true then major hand is domaniant hand
 
     def __init__(self):
         """Initilaizes attributes."""

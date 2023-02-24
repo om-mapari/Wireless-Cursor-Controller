@@ -17,6 +17,8 @@ class HandRecog:
             finger : int
                 Represent gesture corresponding to Enum 'Gest',
                 stores computed gesture for current frame.
+
+
             ori_gesture : int
                 Represent gesture corresponding to Enum 'Gest',
                 stores gesture being used.
@@ -25,6 +27,8 @@ class HandRecog:
                 stores gesture computed for previous frame.
             frame_count : int
                 total no. of frames since 'ori_gesture' is updated.
+
+                
             hand_result : Object
                 Landmarks obtained from mediapipe.
             hand_label : int
@@ -116,18 +120,17 @@ class HandRecog:
 
         points = [[8,5,0],[12,9,0],[16,13,0],[20,17,0]] 
         self.finger = 0
-        self.finger = self.finger | 0 #thumb
+        self.finger = self.finger | 0 # thumb
         for idx,point in enumerate(points):
             
-            dist = self.get_signed_dist(point[:2])
-            dist2 = self.get_signed_dist(point[1:])
-            dist1 = dist
+            dist = self.get_signed_dist(point[:2]) # (8,5) 
+            dist2 = self.get_signed_dist(point[1:]) # (5,0)  
             try:
                 ratio = round(dist/dist2,1)
             except:
-                ratio = round(dist1/0.01,1) # never happen
+                ratio = round(dist/0.01,1) # never happen
 
-            self.finger = self.finger << 1 # binery gesture 
+            self.finger = self.finger << 1 # left shift == ---00
             if ratio > 0.5 : # if that finger is up
                 self.finger = self.finger | 1
     
@@ -169,6 +172,7 @@ class HandRecog:
         else:
             current_gesture =  self.finger
         
+        # logic to set ori_gesture
         if current_gesture == self.prev_gesture:
             self.frame_count += 1
         else:

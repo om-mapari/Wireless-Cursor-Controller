@@ -1,6 +1,6 @@
 import pyautogui
-import screen_brightness_control as sbcontrol
-from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
+# import screen_brightness_control as sbcontrol
+# from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 from ctypes import cast, POINTER
 from comtypes import CLSCTX_ALL
 from gest import Gest
@@ -87,7 +87,6 @@ class Controller:
         if gesture == Gest.V_GEST: # V shape
             Controller.flag = True
             pyautogui.moveTo(x, y, duration = 0.1)
-
 
 
         elif gesture == Gest.MID and Controller.flag: # left click
