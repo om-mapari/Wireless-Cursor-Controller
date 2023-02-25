@@ -51,7 +51,7 @@ class GestureController:
         True if right hand is domaniant hand, otherwise False.
         default True.
     """
-    gc_mode = 0 
+    gc_mode = 0 # gesture controller is running or not
     cap = None
     CAM_HEIGHT = None
     CAM_WIDTH = None
@@ -67,7 +67,7 @@ class GestureController:
         GestureController.CAM_HEIGHT = GestureController.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
         GestureController.CAM_WIDTH = GestureController.cap.get(cv2.CAP_PROP_FRAME_WIDTH)
     
-    def classify_hands(results):
+    def classify_hands(results): # if many hand detected in frame
         """
         sets 'hr_major', 'hr_minor' based on classification(left, right) of 
         hand obtained from mediapipe, uses 'dom_hand' to decide major and
@@ -75,7 +75,7 @@ class GestureController:
         """
         left, right = None,None
         try:
-            handedness_dict = MessageToDict(results.multi_handedness[0])
+            handedness_dict = MessageToDict(results.multi_handedness[0]) # if one hand in frame
             if handedness_dict['classification'][0]['label'] == 'Right':
                 right = results.multi_hand_landmarks[0]
             else :
@@ -84,7 +84,7 @@ class GestureController:
             pass
 
         try:
-            handedness_dict = MessageToDict(results.multi_handedness[1])
+            handedness_dict = MessageToDict(results.multi_handedness[1]) # if one more hand in frame = multi hand
             if handedness_dict['classification'][0]['label'] == 'Right':
                 right = results.multi_hand_landmarks[1]
             else :
@@ -107,7 +107,7 @@ class GestureController:
         """
         
         handmajor = HandRecog(HLabel.MAJOR) # 1
-        handminor = HandRecog(HLabel.MINOR) # 0 for pinch like gesture
+        handminor = HandRecog(HLabel.MINOR) # 0 
 
         with mp_hands.Hands(max_num_hands = 2,min_detection_confidence=0.5, min_tracking_confidence=0.5) as hands:
             while GestureController.cap.isOpened() and GestureController.gc_mode: # 1 frame per unit
@@ -136,7 +136,8 @@ class GestureController:
                     if gest_name == Gest.PINCH_MINOR: #for pinch gesture
                         Controller.handle_controls(gest_name, handminor.hand_result)
                     else:
-                        gest_name = handmajor.get_gesture()
+                        gest_name = handmajor.get_gesture() # always
+                        # print(gest_name)
                         Controller.handle_controls(gest_name, handmajor.hand_result)
                     
                     for hand_landmarks in results.multi_hand_landmarks:

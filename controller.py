@@ -1,8 +1,7 @@
+# import libraries
+
+
 import pyautogui
-# import screen_brightness_control as sbcontrol
-# from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
-from ctypes import cast, POINTER
-from comtypes import CLSCTX_ALL
 from gest import Gest
 
 
@@ -21,21 +20,19 @@ class Controller:
         true if V gesture is detected
     grabflag : bool
         true if FIST gesture is detected
-
+    prev_hand : tuple
+        stores (x, y) coordinates of hand in previous frame.
+    
     """
 
     tx_old = 0
     ty_old = 0
-    trial = True
     flag = False
     grabflag = False
-
-    framecount = 0
     prev_hand = None
+    
+    
 
-
-    # Locate Hand to get Cursor Position
-    # Stabilize cursor by Dampening
     def get_position(hand_result):
         """
         returns coordinates of current hand position.
@@ -47,52 +44,84 @@ class Controller:
         -------
         tuple(float, float)
         """
+
         point = 9
         position = [hand_result.landmark[point].x ,hand_result.landmark[point].y]
-        sx,sy = pyautogui.size()
-        x_old,y_old = pyautogui.position()
+
+        # After this line is executed, sx will contain the width of the computer screen and sy will contain the height of the computer screen. ------ screen size
+        sx,sy = pyautogui.size() 
+
+
+        #this function position() returns the current position of the mouse on the screen in x and y coordinates.    ------ old coordinate of mouse
+        x_old,y_old = pyautogui.position() 
+
+
         x = int(position[0]*sx)
         y = int(position[1]*sy)
+
+
         if Controller.prev_hand is None:
             Controller.prev_hand = x,y
+
+
         delta_x = x - Controller.prev_hand[0]
         delta_y = y - Controller.prev_hand[1]
 
         distsq = delta_x**2 + delta_y**2
         ratio = 1
+
         Controller.prev_hand = [x,y]
 
-        if distsq <= 25:
+        if distsq <= 25: # 5
             ratio = 0
-        elif distsq <= 900:
+        elif distsq <= 900: # 30
             ratio = 0.07 * (distsq ** (1/2))
         else:
             ratio = 2.1
         x , y = x_old + delta_x*ratio , y_old + delta_y*ratio
         return (x,y)
 
+    
 
     def handle_controls(gesture, hand_result):  
-        """Impliments all gesture functionality."""      
+        """Impliments all gesture functionality.""" 
+
+        #initializing two variables "x" and "y" to None. 
         x,y = None,None
+
+        #reset previous gesture
+        #If the gesture is not "PALM", then "x" and "y" are assigned the position of the hand.
         if gesture != Gest.PALM :
             x,y = Controller.get_position(hand_result)
         
-        # flag reset
+        # if gesture is not "FIST" then set grabflag= False
         if gesture != Gest.FIST and Controller.grabflag:
             Controller.grabflag = False
             pyautogui.mouseUp(button = "left")
 
-
-        if gesture == Gest.V_GEST: # V shape
+        #current gesture
+        # v - gesture
+        if gesture == Gest.V_GEST:
             Controller.flag = True
             pyautogui.moveTo(x, y, duration = 0.1)
 
+        # fist -gesture
+        elif gesture == Gest.FIST:
+            if not Controller.grabflag : 
+                Controller.grabflag = True
+                pyautogui.mouseDown(button = "left")
+            pyautogui.moveTo(x, y, duration = 0.1)
 
-        elif gesture == Gest.MID and Controller.flag: # left click
+        # mid -gesture
+        elif gesture == Gest.MID and Controller.flag:
             pyautogui.click()
             Controller.flag = False
 
-        elif gesture == Gest.INDEX and Controller.flag: # right click
+        # index -gesture
+        elif gesture == Gest.INDEX and Controller.flag:
             pyautogui.click(button='right')
             Controller.flag = False
+
+
+
+        

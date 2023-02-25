@@ -149,14 +149,15 @@ class HandRecog:
         if self.hand_result == None:
             return Gest.PALM
 
-        current_gesture = Gest.PALM
-        if self.finger in [Gest.LAST3,Gest.LAST4] and self.get_dist([8,4]) < 0.05:
-            if self.hand_label == HLabel.MINOR :
-                current_gesture = Gest.PINCH_MINOR
-            else:
-                current_gesture = Gest.PINCH_MAJOR
+        # current_gesture = Gest.PALM
+        # if self.finger in [Gest.LAST3,Gest.LAST4] and self.get_dist([8,4]) < 0.05:
+        #     if self.hand_label == HLabel.MINOR :
+        #         current_gesture = Gest.PINCH_MINOR
+        #     else:
+        #         current_gesture = Gest.PINCH_MAJOR
 
         elif Gest.FIRST2 == self.finger :
+            # print(self.finger)
             point = [[8,12],[5,9]]
             dist1 = self.get_dist(point[0])
             dist2 = self.get_dist(point[1])

@@ -14,7 +14,7 @@ class Gest(IntEnum):
     MID = 4  # 00100
     LAST3 = 7  # 00111
     INDEX = 8  # 01000
-    FIRST2 = 12  # 11000
+    FIRST2 = 12  # 01100
     LAST4 = 15  # 01111
     THUMB = 16  # 10000
     PALM = 31  # 11111
